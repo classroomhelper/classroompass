@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Classroom Helper - Send Weekly Password</title>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script>
+    // Initialize EmailJS
+    (function(){
+        emailjs.init("_ZdDFiHhVYwztkMId"); // Replace with your EmailJS public key
+    })();
+
+    // === CONFIG ===
+    const PAGE_PASSWORD = "YourSitePassword"; // Page login password
+    let CURRENT_PASSWORD = "LeeithPlots93"; // Weekly password to send
+    let EXPIRY_DATE = new Date();
+    EXPIRY_DATE.setDate(EXPIRY_DATE.getDate() + 7); // valid for 1 week
+
+    // === Send Email Function ===
+    function sendEmail() {
+        const params = {
+            email: document.getElementById("email").value.trim(), // must match template variable
+            passcode: CURRENT_PASSWORD,
+            time: EXPIRY_DATE.toDateString()
+        };
+
+        if(!params.email) {
+            alert("Recipient email is empty!");
+            return;
+        }
+
+        console.log("Sending email with params:", params);
+
+        const serviceId = "service_2i20ksj"; // EmailJS Service ID
+        const templateId = "template_v1f1la8"; // EmailJS Template ID
+
+        emailjs.send(serviceId, templateId, params)
+            .then((res) => {
+                document.getElementById("email").value = "";
+                console.log("Email sent successfully:", res);
+                alert(`Password sent to ${params.email}`);
+            })
+            .catch((err) => {
+                console.error("Error sending email:", err);
+                alert("Failed to send password. Check console for details.");
+            });
+    }
+
+    // Handle form submission
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("emailForm").addEventListener("submit", function(event){
+            event.preventDefault();
+            sendEmail();
+        });
+    });
+
+    // Page password check
+    function checkPagePassword(){
+        const input = document.getElementById("pagePassword").value;
+        if(input === PAGE_PASSWORD){
+            document.getElementById("loginDiv").style.display = "none";
+            document.getElementById("formDiv").style.display = "block";
+        } else {
+            alert("Incorrect page password!");
+        }
+    }
+</script>
+<style>
+body { font-family: Arial; max-width: 500px; margin: 40px auto; padding: 0 20px; background-color: #f2f2f2; }
+h2 { text-align: center; }
+input, button { width: 100%; padding: 10px; margin: 8px 0; box-sizing: border-box; }
+button { cursor: pointer; background-color: #007BFF; color: white; border: none; }
+button:hover { background-color: #0056b3; }
+.container { background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+
+<h2>Classroom Helper - Send Weekly Password</h2>
+
+<!-- Page login -->
+<div id="loginDiv" class="container">
+    <input type="password" id="pagePassword" placeholder="Enter Page Password">
+    <button onclick="checkPagePassword()">Login</button>
+</div>
+
+<!-- Email form -->
+<div id="formDiv" class="container" style="display:none;">
+    <form id="emailForm">
+        <label for="email">Recipient's Email:</label>
+        <input type="email" id="email" placeholder="Email" required>
+        <button type="submit">Send Weekly Password</button>
+    </form>
+</div>
+
+</body>
+</html>
